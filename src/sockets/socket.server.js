@@ -4,6 +4,8 @@ const jwt = require("jsonwebtoken");
 const userModel = require("../models/user.model");
 const aiService = require("../services/ai.service")
 const messageModel = require("../models/message.model");
+const {createMemory, queryMemory} = require("../services/vector.service")
+
 
 // Initialize and configure the Socket.IO server for real-time chat + AI replies
 // This is called from your HTTP server (for example, in `src/app.js`)
@@ -41,9 +43,6 @@ function initSocketServer(httpServer) {
 
     // New WebSocket connection established for an authenticated user
     io.on("connection", (socket) => {
-
-
-
 
         // User sent a message to the AI for a specific chat
         // Steps: save user msg -> build chat history -> get AI reply -> save reply -> emit back
