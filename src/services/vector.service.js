@@ -8,7 +8,7 @@ const pc = new Pinecone({ apiKey: process.env.PINECONE_API_KEY });
 const brainiumIndex = pc.Index('brainium-gpt')
 
 async function createMemory({ vectors, metadata, messageId }) {
-    await cohortChatGptIndex.upsert([ {
+    await brainiumIndex.upsert([ {
         id: messageId,
         values: vectors,
         metadata
@@ -17,7 +17,7 @@ async function createMemory({ vectors, metadata, messageId }) {
 
 async function queryMemory({ queryVector, limit = 5, metadata }) {
 
-    const data = await cohortChatGptIndex.query({
+    const data = await brainiumIndex.query({
         vector: queryVector,
         topK: limit,
         filter: metadata ? { metadata } : undefined,
