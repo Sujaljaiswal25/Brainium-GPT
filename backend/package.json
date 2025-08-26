@@ -1,6 +1,7 @@
 {
-  "name": "backend",
+  "name": "cohort-1-project-chat-gpt",
   "version": "1.0.0",
+  "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -9,7 +10,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
+  "type": "commonjs",
   "dependencies": {
     "@google/genai": "^1.14.0",
     "@pinecone-database/pinecone": "^6.1.2",
