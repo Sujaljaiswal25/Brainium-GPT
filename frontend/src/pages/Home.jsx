@@ -8,6 +8,7 @@ import '../components/chat/ChatLayout.css';
 import { fakeAIReply } from '../components/chat/aiClient.js';
 import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import {
   ensureInitialChat,
   startNewChat,
@@ -28,6 +29,7 @@ const Home = () => {
   const isSending = useSelector(state => state.chat.isSending);
   const [ sidebarOpen, setSidebarOpen ] = React.useState(false);
   const [ socket, setSocket ] = useState(null);
+  const navigate = useNavigate();
 
   const activeChat = chats.find(c => c.id === activeChatId) || null;
 
@@ -48,7 +50,7 @@ const Home = () => {
     if (title) title = title.trim();
     if (!title) return
 
-    const response = await axios.post("http://localhost:3000/api/chat", {
+    const response = await axios.post("https://brainium-gpt.onrender.com/api/chat", {
       title
     }, {
       withCredentials: true
@@ -58,31 +60,44 @@ const Home = () => {
     setSidebarOpen(false);
   }
 
-  // Ensure at least one chat exists initially
+  // Ensure user is authenticated, then load chats and init socket
   useEffect(() => {
+    let cancelled = false;
 
-    axios.get("http://localhost:3000/api/chat", { withCredentials: true })
+    axios
+      .get("https://brainium-gpt.onrender.com/api/chat", { withCredentials: true })
       .then(response => {
+        if (cancelled) return;
         dispatch(setChats(response.data.chats.reverse()));
+
+        const tempSocket = io("https://brainium-gpt.onrender.com", { withCredentials: true });
+
+        tempSocket.on("ai-response", (messagePayload) => {
+          console.log("Received AI response:", messagePayload);
+          setMessages((prevMessages) => [
+            ...prevMessages,
+            { type: 'ai', content: messagePayload.content }
+          ]);
+          dispatch(sendingFinished());
+        });
+
+        setSocket(tempSocket);
       })
+      .catch(err => {
+        const status = err?.response?.status;
+        if (status === 401) {
+          navigate('/login', { replace: true });
+        } else {
+          console.error('Failed to fetch chats:', err);
+        }
+      });
 
-    const tempSocket = io("http://localhost:3000", {
-      withCredentials: true,
-    })
-
-    tempSocket.on("ai-response", (messagePayload) => {
-      console.log("Received AI response:", messagePayload);
-
-      setMessages((prevMessages) => [ ...prevMessages, {
-        type: 'ai',
-        content: messagePayload.content
-      } ]);
-
-      dispatch(sendingFinished());
-    });
-
-    setSocket(tempSocket);
-
+    return () => {
+      cancelled = true;
+      if (socket) {
+        try { socket.disconnect(); } catch {}
+      }
+    };
   }, []);
 
   const sendMessage = async () => {
@@ -119,7 +134,7 @@ const Home = () => {
 
   const getMessages = async (chatId) => {
 
-   const response = await  axios.get(`http://localhost:3000/api/chat/messages/${chatId}`, { withCredentials: true })
+   const response = await  axios.get(`https://brainium-gpt.onrender.com/api/chat/messages/${chatId}`, { withCredentials: true })
 
    console.log("Fetched messages:", response.data.messages);
 
@@ -152,8 +167,26 @@ return (
       {messages.length === 0 && (
         <div className="chat-welcome" aria-hidden="true">
           <div className="chip">Early Preview</div>
-          <h1>ChatGPT Clone</h1>
+          <h1>Branium AI</h1>
           <p>Ask anything. Paste text, brainstorm ideas, or get quick explanations. Your chats stay in the sidebar so you can pick up where you left off.</p>
+          <div className="welcome-actions">
+            <button className="prompt-card" type="button" onClick={() => dispatch(setInput('Summarize this article: '))}>
+              <span className="prompt-title">Summarize this article</span>
+              <span className="prompt-desc">Paste a link and get key takeaways</span>
+            </button>
+            <button className="prompt-card" type="button" onClick={() => dispatch(setInput('Brainstorm ideas about: '))}>
+              <span className="prompt-title">Brainstorm ideas</span>
+              <span className="prompt-desc">Generate creative directions quickly</span>
+            </button>
+            <button className="prompt-card" type="button" onClick={() => dispatch(setInput('Help me fix this code: '))}>
+              <span className="prompt-title">Fix my code</span>
+              <span className="prompt-desc">Explain errors and propose a patch</span>
+            </button>
+            <button className="prompt-card" type="button" onClick={() => dispatch(setInput('Draft an email about: '))}>
+              <span className="prompt-title">Write an email</span>
+              <span className="prompt-desc">Professional, concise tone</span>
+            </button>
+          </div>
         </div>
       )}
       <ChatMessages messages={messages} isSending={isSending} />

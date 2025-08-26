@@ -1,107 +1,181 @@
-/* === ChatGPT-like bottom composer === */
-/* Centered, max-width column, floating pill with subtle border */
-
+/* Completely redesigned composer with modern glass morphism effect */
 .composer {
-    position: sticky; /* stays above scroll end */
+    position: sticky;
     bottom: 0;
     width: 100%;
-    padding: 24px 0 32px; /* vertical breathing room */
+    padding: var(--space-6) 0 var(--space-8);
     display: flex;
     justify-content: center;
-    background: linear-gradient(to top, rgba(0,0,0,.85), rgba(0,0,0,0));
-    backdrop-filter: blur(12px);
-}
-
-.composer-surface {
+    background: linear-gradient(
+      to top,
+      rgba(255, 255, 255, 0.95) 0%,
+      rgba(255, 255, 255, 0.8) 70%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+  
+  .composer-surface {
     display: flex;
     align-items: flex-end;
-    gap: 8px;
-    max-width: 820px; /* ChatGPT input width vibes */
+    gap: var(--space-3);
+    max-width: 820px;
     width: 100%;
-    margin: 0 32px;
-    background: #1f1f20;
-    border: 1px solid #3a3a3c;
-    border-radius: 24px;
-    padding: 12px 14px 14px 18px; /* top tighter than bottom for hint room */
+    margin: 0 var(--space-8);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-3) var(--space-4) var(--space-4) var(--space-5);
     position: relative;
-    transition: border-color .15s, background-color .15s, box-shadow .15s;
-}
-
-.composer-surface:focus-within {
-    background: #232324;
-    border-color: #565759;
-    box-shadow: 0 0 0 1px #565759, 0 0 0 4px rgba(86,87,89,.25);
-}
-
-.composer-field { flex: 1; position: relative; }
-
-.composer-input {
+    transition: all var(--transition-smooth);
+    box-shadow: var(--shadow-md);
+  }
+  
+  .composer-surface:focus-within {
+    background: var(--color-bg);
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.1), var(--shadow-md);
+    transform: translateY(-2px);
+  }
+  
+  .composer-field {
+    flex: 1;
+    position: relative;
+  }
+  
+  .composer-input {
     width: 100%;
     resize: none;
     border: 0;
     outline: none;
     background: transparent;
-    color: #f5f5f5;
+    color: var(--color-text);
     font: inherit;
-    line-height: 1.5;
-    max-height: 260px;
-    padding: 0 0 18px 0; /* space for hint overlay */
-}
-
-.composer-input::placeholder { color: #8d8d91; }
-
-.composer-hint {
+    line-height: 1.6;
+    max-height: 200px;
+    padding: 0 0 var(--space-5) 0;
+    font-size: var(--text-base);
+  }
+  
+  .composer-input::placeholder {
+    color: var(--color-text-muted);
+    font-weight: var(--font-weight-normal);
+  }
+  
+  .composer-hint {
     position: absolute;
     left: 2px;
     bottom: 2px;
-    font-size: 11px;
-    color: #5f6165;
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
     pointer-events: none;
     user-select: none;
-    line-height: 1.1;
-    font-weight: 500;
-}
-
-/* Icon-only circular send button */
-.send-btn.icon-btn {
-    --size: 40px;
+    line-height: 1.2;
+    font-weight: var(--font-weight-medium);
+    opacity: 0.7;
+  }
+  
+  /* Redesigned send button with gradient and modern interactions */
+  .send-btn.icon-btn {
+    --size: 44px;
     width: var(--size);
     height: var(--size);
     border-radius: 50%;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: #3a3a3c;
-    border: 1px solid #525255;
-    color: #f1f1f2;
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
+    border: none;
+    color: white;
     cursor: pointer;
-    transition: background-color .15s, border-color .15s, transform .15s;
+    transition: all var(--transition-fast);
     flex-shrink: 0;
-}
-
-.send-btn.icon-btn:hover:not(:disabled) { background:#4a4a4d; }
-.send-btn.icon-btn:active:not(:disabled) { background:#343436; transform:translateY(1px); }
-.send-btn.icon-btn:disabled { opacity:.35; cursor: default; }
-.send-btn.icon-btn:focus-visible { outline:none; box-shadow:0 0 0 2px #fff,0 0 0 4px #000; }
-
-.send-icon { display:inline-flex; }
-
-/* Slide arrow a tad */
-.send-btn.icon-btn:hover:not(:disabled) .send-icon { transform: translateX(1px); }
-.send-icon svg { transition: transform .15s; }
-
-/* Compact adjustments for very narrow screens */
-@media (max-width:600px) {
-    .composer { padding: 16px 0 26px; }
-    .composer-surface { margin:0 12px; border-radius:20px; padding:10px 12px 12px 16px; }
-    .send-btn.icon-btn { --size:36px; }
-}
-
-@media (max-width:420px) {
-    .composer-hint { display:none; }
-    .composer-input { padding-bottom:0; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .send-btn.icon-btn, .send-icon svg { transition: none; }
-}
+    box-shadow: 0 4px 12px rgba(8, 145, 178, 0.3);
+  }
+  
+  .send-btn.icon-btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, var(--color-primary-hover), var(--color-primary));
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 6px 20px rgba(8, 145, 178, 0.4);
+  }
+  
+  .send-btn.icon-btn:active:not(:disabled) {
+    transform: translateY(0) scale(0.98);
+    box-shadow: 0 2px 8px rgba(8, 145, 178, 0.3);
+  }
+  
+  .send-btn.icon-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: var(--shadow-xs);
+  }
+  
+  .send-btn.icon-btn:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.3), 0 4px 12px rgba(8, 145, 178, 0.3);
+  }
+  
+  .send-icon {
+    display: inline-flex;
+    transition: transform var(--transition-fast);
+  }
+  
+  .send-btn.icon-btn:hover:not(:disabled) .send-icon {
+    transform: translateX(2px);
+  }
+  
+  .send-icon svg {
+    transition: transform var(--transition-fast);
+    width: 20px;
+    height: 20px;
+    stroke-width: 2.5;
+  }
+  
+  /* Enhanced responsive design */
+  @media (max-width: 768px) {
+    .composer {
+      padding: var(--space-4) 0 var(--space-6);
+    }
+    .composer-surface {
+      margin: 0 var(--space-4);
+      border-radius: var(--radius-lg);
+      padding: var(--space-3) var(--space-3) var(--space-3) var(--space-4);
+    }
+    .send-btn.icon-btn {
+      --size: 40px;
+    }
+    .send-icon svg {
+      width: 18px;
+      height: 18px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .composer-hint {
+      display: none;
+    }
+    .composer-input {
+      padding-bottom: 0;
+    }
+    .composer-surface {
+      margin: 0 var(--space-3);
+    }
+  }
+  
+  /* Dark theme support */
+  @media (prefers-color-scheme: dark) {
+    .composer {
+      background: linear-gradient(to top, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 0.8) 70%, rgba(15, 23, 42, 0) 100%);
+    }
+  }
+  
+  @media (prefers-reduced-motion: reduce) {
+    .send-btn.icon-btn,
+    .send-icon svg,
+    .composer-surface {
+      transition: none;
+    }
+  }
+  
