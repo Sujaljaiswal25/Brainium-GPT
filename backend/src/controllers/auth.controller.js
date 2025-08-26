@@ -1,73 +1,66 @@
-const userModel = require ("../models/user.model")
-const bcrypt = require("bcryptjs")
-const jwt = require("jsonwebtoken");
+const userModel = require('../models/user.model');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 
-async function postRegisterController(req, res){
+async function registerUser(req, res) {
 
-    const {email, password, fullName:{firstName, lastName}} = req.body;
+    const { fullName: { firstName, lastName }, email, password } = req.body;
 
+    const isUserAlreadyExists = await userModel.findOne({ email })
 
-    const isUserExist = await userModel.findOne({
-        email
-    })
-
-    if(isUserExist){
-        return res.status(400).json({
-            message:"User is already exist"
-        })
+    if (isUserAlreadyExists) {
+        res.status(400).json({ message: "User already exists" });
     }
+
 
     const hashPassword = await bcrypt.hash(password, 10);
 
 
     const user = await userModel.create({
-        email,
-        password: hashPassword,
-        fullName:{
+        fullName: {
             firstName, lastName
-        }
+        },
+        email,
+        password: hashPassword
     })
 
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET)
 
-    const token = jwt.sign({id:user._id}, process.env.JWT_SECRET);
 
-    res.cookie("token", token);
+    res.cookie("token", token)
+
 
     res.status(201).json({
-        message:"user registerd",
+        message: "User registered successfully",
         user: {
             email: user.email,
             _id: user._id,
             fullName: user.fullName
         }
     })
-    
 }
 
+async function loginUser(req, res) {
 
+    const { email, password } = req.body;
 
-async function postLoginController(req, res){
-
-    const {email, password} = req.body;
-
-    user = await userModel.findOne({
+    const user = await userModel.findOne({
         email
     })
 
-    if(!user){
-        return res.status(400).json({
-            message:"email or password is invalid"
-        })
+    if (!user) {
+        return res.status(400).json({ message: "Invalid email or password" });
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
+
 
     if (!isPasswordValid) {
         return res.status(400).json({ message: "Invalid email or password" });
     }
 
-    const token = jwt.sign({id:user._id}, process.env.JWT_SECRET);
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
 
 
     res.cookie("token", token);
@@ -85,8 +78,7 @@ async function postLoginController(req, res){
 }
 
 
-
 module.exports = {
-    postRegisterController,
-    postLoginController
+    registerUser,
+    loginUser
 }
