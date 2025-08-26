@@ -35,8 +35,22 @@
 
 import React from 'react';
 import './ChatSidebar.css';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const ChatSidebar = ({ chats, activeChatId, onSelectChat, onNewChat, open }) => {
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await axios.post('https://brainium-gpt.onrender.com/api/auth/logout', {}, { withCredentials: true });
+    } catch (e) {
+      // ignore network errors and still navigate
+      console.error('Logout error', e);
+    } finally {
+      navigate('/login', { replace: true });
+    }
+  };
   return (
     <>
       {/* Mobile backdrop */}
@@ -122,6 +136,9 @@ const ChatSidebar = ({ chats, activeChatId, onSelectChat, onNewChat, open }) => 
               </svg>
             </button>
           </div>
+          <button className="small-btn logout-btn" onClick={handleLogout} aria-label="Log out">
+            Logout
+          </button>
         </div>
       </aside>
     </>

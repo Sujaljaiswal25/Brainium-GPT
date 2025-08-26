@@ -18,6 +18,8 @@
     --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.1);
     --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
     --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.2);
+    --danger: #ff4d4f;
+    --danger-hover: #d9363e;
   }
   
   /* Main Sidebar Container */
@@ -310,6 +312,35 @@
     padding: 16px;
     border-top: 1px solid var(--sidebar-border);
     background: var(--sidebar-surface);
+  }
+
+  /* Logout Button */
+  .logout-btn {
+    width: 100%;
+    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 12px;
+    background: transparent;
+    border: 1px solid var(--sidebar-border);
+    border-radius: var(--radius-sm);
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+
+  .logout-btn:hover {
+    background: rgba(255, 77, 79, 0.08);
+    border-color: rgba(255, 77, 79, 0.35);
+    color: #ffdadb;
+  }
+
+  .logout-btn:active {
+    transform: scale(0.98);
   }
   
   .upgrade-card {

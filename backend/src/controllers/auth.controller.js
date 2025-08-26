@@ -13,7 +13,6 @@ async function registerUser(req, res) {
         res.status(400).json({ message: "User already exists" });
     }
 
-
     const hashPassword = await bcrypt.hash(password, 10);
 
 
@@ -77,8 +76,23 @@ async function loginUser(req, res) {
 
 }
 
+async function logoutUser(req, res) {
+    try {
+        // Clear cookie (basic)
+        res.clearCookie('token');
+        // Also attempt with explicit options for cross-site deployments
+        try {
+            res.clearCookie('token', { httpOnly: true, sameSite: 'none', secure: true, path: '/' });
+        } catch {}
+        return res.status(200).json({ message: 'Logged out successfully' });
+    } catch (err) {
+        console.error('Logout error', err);
+        return res.status(500).json({ message: 'Failed to logout' });
+    }
+}
 
 module.exports = {
     registerUser,
-    loginUser
+    loginUser,
+    logoutUser
 }
